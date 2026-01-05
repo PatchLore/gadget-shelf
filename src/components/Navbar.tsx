@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
@@ -11,7 +12,7 @@ const categories = [
   { name: 'Tech', href: '/?category=Tech' },
 ];
 
-export default function Navbar() {
+function CategorySelect() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentCategory = searchParams.get('category') || 'All';
@@ -21,6 +22,21 @@ export default function Navbar() {
     router.push(value);
   };
 
+  return (
+    <select 
+      value={currentCategory === 'All' ? '/' : `/?category=${currentCategory}`}
+      onChange={handleCategoryChange}
+      className="bg-slate-900 border border-slate-800 rounded-md px-3 py-1.5 text-sm text-slate-300"
+    >
+      <option value="/">All</option>
+      <option value="/?category=Beauty">Beauty</option>
+      <option value="/?category=Home">Home</option>
+      <option value="/?category=Tech">Tech</option>
+    </select>
+  );
+}
+
+export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-slate-800 bg-slate-950/95 backdrop-blur supports-[backdrop-filter]:bg-slate-950/80">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -46,16 +62,13 @@ export default function Navbar() {
           </div>
 
           <div className="md:hidden">
-            <select 
-              value={currentCategory === 'All' ? '/' : `/?category=${currentCategory}`}
-              onChange={handleCategoryChange}
-              className="bg-slate-900 border border-slate-800 rounded-md px-3 py-1.5 text-sm text-slate-300"
-            >
-              <option value="/">All</option>
-              <option value="/?category=Beauty">Beauty</option>
-              <option value="/?category=Home">Home</option>
-              <option value="/?category=Tech">Tech</option>
-            </select>
+            <Suspense fallback={
+              <select className="bg-slate-900 border border-slate-800 rounded-md px-3 py-1.5 text-sm text-slate-300">
+                <option>All</option>
+              </select>
+            }>
+              <CategorySelect />
+            </Suspense>
           </div>
         </div>
       </div>
